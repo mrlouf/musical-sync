@@ -49,6 +49,8 @@ func main() {
 	http.HandleFunc("/sync-status", syncStatusHandler)
 	http.HandleFunc("/poll/deezer", pollDeezerHandler)
 	http.HandleFunc("/poll/spotify", pollSpotifyHandler)
+	http.HandleFunc("/login/deezer", loginDeezerHandler)
+	http.HandleFunc("/login/spotify", loginSpotifyHandler)
 
 	// Create server
 	server := &http.Server{
@@ -163,6 +165,30 @@ func pollSpotifyHandler(w http.ResponseWriter, r *http.Request) {
 
 	syncStatus.SpotifyStatus = "✅ Connected"
 	syncStatus.LastSync = time.Now()
+
+	json.NewEncoder(w).Encode(result)
+}
+
+func loginDeezerHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Simulate login process
+	result := map[string]interface{}{
+		"status":  "success",
+		"message": "Deezer login simulated successfully",
+	}
+
+	json.NewEncoder(w).Encode(result)
+}
+
+func loginSpotifyHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Simulate login process
+	result := map[string]interface{}{
+		"status":  "success",
+		"message": "Spotify login simulated successfully",
+	}
 
 	json.NewEncoder(w).Encode(result)
 }

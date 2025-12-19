@@ -3,7 +3,7 @@ services:
     build:
       context: ./nginx
       dockerfile: Dockerfile
-    container_name: musical-sync-nginx
+    container_name: nginx
     ports:
       - "8000:80"
     depends_on:
@@ -17,7 +17,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: musical-sync-frontend
+    container_name: frontend
     networks:
       - musical-sync-network
     restart: unless-stopped
@@ -26,7 +26,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: musical-sync-backend
+    container_name: backend
     environment:
       - PORT=8081
     networks:

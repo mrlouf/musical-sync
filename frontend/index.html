@@ -11,6 +11,15 @@
         <h1>🎵 Musical Sync</h1>
         <p class="subtitle">Synchronise your playlists across platforms</p>
 
+        <div style="margin-bottom: 20px" class="button-group">
+            <button onclick="loginDeezer()">
+                Login to Deezer
+            </button>
+            <button onclick="loginSpotify()">
+                Login to Spotify
+            </button>
+        </div>
+
         <div id="status-container">
             <div class="sync-status">
                 <h2 style="margin-bottom: 20px; color: #333;">Sync Status</h2>
@@ -71,7 +80,29 @@
                 });
         }
 
-        // Check backend health on page load
+		function loginDeezer() {
+            fetch('/api/login/deezer')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('status-container').innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+		function loginSpotify() {
+            fetch('/api/login/spotify')
+                .then(response => response.text())
+
+                .then(html => {
+                    document.getElementById('status-container').innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             checkBackendHealth();
         });
