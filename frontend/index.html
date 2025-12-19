@@ -170,6 +170,7 @@
             fetch('/api/health')
                 .then(response => response.text())
                 .then(html => {
+                    // Safe to use innerHTML here as the backend returns trusted HTML
                     document.getElementById('backend-status').innerHTML = html;
                 })
                 .catch(error => {
@@ -183,6 +184,7 @@
             fetch('/api/sync-status')
                 .then(response => response.text())
                 .then(html => {
+                    // Safe to use innerHTML here as the backend returns trusted HTML
                     document.getElementById('status-container').innerHTML = html;
                 })
                 .catch(error => {
