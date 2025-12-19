@@ -32,8 +32,20 @@ cp .env.example .env
 
 ### 3. Build and run with Docker Compose
 
+**Using Make (recommended):**
+
 ```bash
-docker-compose up --build
+make build    # Build all images
+make up       # Start all services
+make logs     # View logs
+make down     # Stop all services
+make help     # See all available commands
+```
+
+**Using Docker Compose directly:**
+
+```bash
+docker compose up --build
 ```
 
 The application will be available at `http://localhost`
@@ -41,7 +53,9 @@ The application will be available at `http://localhost`
 ### 4. Stop the application
 
 ```bash
-docker-compose down
+make down
+# or
+docker compose down
 ```
 
 ## Services
