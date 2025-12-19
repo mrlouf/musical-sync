@@ -1,5 +1,5 @@
 # musical-sync
-A backend oriented project using HTMX and Golang to synchronise your playlists crossplatforms.
+A backend oriented project using JavaScript and Golang to synchronize your playlists across platforms.
 
 ## Architecture
 
