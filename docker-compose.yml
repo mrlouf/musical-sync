@@ -1,0 +1,38 @@
+services:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: musical-sync-nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - musical-sync-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: musical-sync-frontend
+    networks:
+      - musical-sync-network
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: musical-sync-backend
+    environment:
+      - PORT=8081
+    networks:
+      - musical-sync-network
+    restart: unless-stopped
+
+networks:
+  musical-sync-network:
+    driver: bridge
