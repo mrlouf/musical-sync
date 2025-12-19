@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: musical-sync-nginx
     ports:
-      - "80:80"
+      - "8000:80"
     depends_on:
       - frontend
       - backend
