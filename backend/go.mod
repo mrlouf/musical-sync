@@ -1,3 +1,3 @@
-module github.com/mrlouf/musical-sync
+module backend
 
-go 1.25
+go 1.25.0
