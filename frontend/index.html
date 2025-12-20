@@ -80,8 +80,8 @@
                 });
         }
 
-		function loginDeezer() {
-            fetch('/api/login/deezer')
+		function getPlaylistFromDeezer() {
+            fetch('/api/playlist/deezer')
                 .then(response => response.text())
                 .then(html => {
                     document.getElementById('status-container').innerHTML = html;
