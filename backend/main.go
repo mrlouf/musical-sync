@@ -24,6 +24,7 @@ func main() {
 	http.HandleFunc("/health", handlers.HealthHandler)
 	http.HandleFunc("/playlist/deezer", handlers.GetTrackNumberFromBothPlaylistsHandler)
 	http.HandleFunc("/login/spotify", handlers.LoginSpotifyHandler)
+	http.HandleFunc("/sync-status", handlers.GetSyncStatusHandler)
 
 	server := &http.Server{
 		Addr: ":" + port,
