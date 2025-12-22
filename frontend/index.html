@@ -49,6 +49,9 @@
             <button onclick="getRandomTrack()">
                 Get random track
             </button>
+            <button onclick="getAlbum()">
+                Get a random album
+            </button>
         </div>
     </div>
 
@@ -65,12 +68,57 @@
                 });
         }
 
-        function refreshSyncStatus() {
-            fetch('/api/sync-status')
+        function getRandomTrack() {
+            fetch('/api/track/random')
                 .then(response => response.text())
-                .then(html => {
-                    // Safe to use innerHTML here as the backend returns trusted HTML
-                    document.getElementById('status-container').innerHTML = html;
+                .then(trackinfo => {
+                    const container = document.getElementById('status-container');
+
+                    const trackData = JSON.parse(trackinfo);
+
+                    container.innerHTML = `<div class="sync-status">
+                        <h2 style="margin-bottom: 20px; color: #333;">Track retrieved:</h2>
+                        <div class="status-item">
+                            <span class="status-label">${trackData.artist}</span>
+                            <span class="status-label">${trackData.track}</span>
+                            <span class="status-label">${trackData.album}</span>
+                        </div>
+                    </div>`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function getAlbum() {
+            fetch('/api/album/random')
+                .then(response => response.text())
+                .then(albuminfo => {
+                    const container = document.getElementById('status-container');
+
+                    const trackData = JSON.parse(albuminfo);
+
+                    console.log(trackData);
+
+                    const tracks = trackData.tracks;
+
+                    const tracklist = Array.isArray(tracks) ? tracks.map((element, idx) => {
+                        const title = typeof element === 'string' ? element : (element.title || element.name || JSON.stringify(element));
+                        return `<div class="status-item">
+                                    <span class="status-label">${idx + 1}. ${title}</span>
+                                </div>`;
+                    }) : [];
+
+                    container.innerHTML = `<div class="sync-status">
+                        <h2 style="margin-bottom: 20px; color: #333;">Album retrieved:</h2>
+                        <div class="status-item">
+                            <span class="status-label">${trackData.artist}</span>
+                            <span class="status-label">${trackData.album}</span>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            ${tracklist.join('')}
+                        </div>
+                    </div>`;
                 })
                 .catch(error => {
                     console.error('Error:', error);

@@ -31,3 +31,15 @@ type DeezerTrackResponse struct {
 		Title string `json:"title"`
 	} `json:"album"`
 }
+
+type DeezerAlbumResponse struct {
+	Title string `json:"title"`
+	Artist struct {
+		Name string `json:"name"`
+	} `json:"artist"`
+	Tracks struct {
+		Data []struct {
+			Title string `json:"title"`
+		} `json:"data"`
+	} `json:"tracks"`
+}

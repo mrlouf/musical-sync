@@ -160,3 +160,33 @@ func GetRandomTrackHandler(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(result)
 }
+
+func GetRandomAlbumHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	
+	url := "https://api.deezer.com/album/705023831" // Example album ID
+
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Fatal(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status":  "error",
+			"message": "Failed to fetch album from Deezer",
+		})
+		return
+	}
+	defer resp.Body.Close()
+
+	var albumResponse models.DeezerAlbumResponse
+	json.NewDecoder(resp.Body).Decode(&albumResponse)
+
+	result := map[string]interface{}{
+		"status":	"success",
+		"album":	albumResponse.Title,
+		"artist":	albumResponse.Artist.Name,
+		"tracks":	albumResponse.Tracks.Data,
+	}
+
+	json.NewEncoder(w).Encode(result)
+}
