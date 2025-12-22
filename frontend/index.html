@@ -42,14 +42,19 @@
         </div>
 
         <div class="button-group">
-            <button onclick="getPlaylist()">
-                Get a playlist
+            <button onclick="getPlaylistFromDeezer()">
+                Get a playlist from Deezer
             </button>
             <button onclick="getRandomTrack()">
-                Get a random track
+                Get a random track from Deezer
             </button>
             <button onclick="getAlbum()">
-                Get a random album
+                Get a random album from Deezer
+            </button>
+        </div>
+        <div class="button-group">
+            <button onclick="getPlaylistFromSpotify()">
+                Get a playlist from Spotify
             </button>
         </div>
         <div class="button-group">
@@ -219,7 +224,7 @@
             }
         }
 
-        function getPlaylist() {
+        function getPlaylistFromDeezer() {
             fetch('/api/playlist/deezer')
                 .then(response => response.text())
                 .then(playlistinfo => {
@@ -237,7 +242,36 @@
                     });
 
                     container.innerHTML = `<div class="sync-status">
-                        <h2 style="margin-bottom: 20px; color: #333;">Playlist retrieved:</h2>
+                        <h2 style="margin-bottom: 20px; color: #333;">Deezer Playlist retrieved:</h2>
+                        <div style="margin-top: 15px;">
+                            ${tracklist.join('')}
+                        </div>
+                    </div>`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function getPlaylistFromSpotify() {
+            fetch('/api/playlist/spotify')
+                .then(response => response.text())
+                .then(playlistinfo => {
+                    const container = document.getElementById('status-container');
+
+                    const trackData = JSON.parse(playlistinfo);
+
+                    const tracks = trackData.tracks;
+
+                    const tracklist = tracks.map((element, idx) => {
+                        const title = typeof element === 'string' ? element : (element.title || element.name || JSON.stringify(element));
+                        return `<div class="status-item">
+                                    <span class="status-label">${idx + 1}. ${title}</span>
+                                </div>`;
+                    });
+
+                    container.innerHTML = `<div class="sync-status">
+                        <h2 style="margin-bottom: 20px; color: #333;">Spotify Playlist retrieved:</h2>
                         <div style="margin-top: 15px;">
                             ${tracklist.join('')}
                         </div>

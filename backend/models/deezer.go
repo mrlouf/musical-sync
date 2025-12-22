@@ -4,12 +4,6 @@ type DeezerTrackNumberResponse struct {
 	Total int `json:"nb_tracks"`
 }
 
-type SpotifyTrackNumberResponse struct {
-	Tracks struct {
-		Total int `json:"total"`
-	} `json:"tracks"`
-}
-
 type DeezerTracklistResponse struct {
 	Title string `json:"title"`
 	Data []struct {
