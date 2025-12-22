@@ -96,19 +96,7 @@ func GetSpotifyPlaylistHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("Spotify API response status: %s\n", resp.Status)
 
-	var playlistData struct {
-		Items []struct {
-			Track struct {
-				Name   string `json:"name"`
-				Artists []struct {
-					Name string `json:"name"`
-				} `json:"artists"`
-				Album struct {
-					Name string `json:"name"`
-				} `json:"album"`
-			} `json:"track"`
-		} `json:"items"`
-	}
+	var playlistData models.SpotifyPlaylistResponse
 
 	json.NewDecoder(resp.Body).Decode(&playlistData)
 

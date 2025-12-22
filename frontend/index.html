@@ -259,13 +259,12 @@
                 .then(playlistinfo => {
                     const container = document.getElementById('status-container');
 
-                    container.innerHTML = playlistinfo
-/*                     const trackData = JSON.parse(playlistinfo);
-
+/*                     container.innerHTML = playlistinfo */
+                    const trackData = JSON.parse(playlistinfo);
                     const tracks = trackData.tracks;
 
                     const tracklist = tracks.map((element, idx) => {
-                        const title = typeof element === 'string' ? element : (element.title || element.name || JSON.stringify(element));
+                        const title = typeof element === 'string' ? element : (element.track.title || element.track.name || JSON.stringify(element));
                         return `<div class="status-item">
                                     <span class="status-label">${idx + 1}. ${title}</span>
                                 </div>`;
@@ -276,7 +275,7 @@
                         <div style="margin-top: 15px;">
                             ${tracklist.join('')}
                         </div>
-                    </div>`; */
+                    </div>`;
                 })
                 .catch(error => {
                     console.error('Error:', error);
