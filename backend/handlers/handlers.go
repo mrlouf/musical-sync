@@ -8,23 +8,8 @@ import (
 	"log"
 
 	"backend/utils"
+	"backend/models"
 )
-
-type DeezerTrackNumberResponse struct {
-	Total int `json:"nb_tracks"`
-}
-
-type SpotifyTrackNumberResponse struct {
-	Tracks struct {
-		Total int `json:"total"`
-	} `json:"tracks"`
-}
-
-type DeezerTracklistResponse struct {
-	Data []struct {
-		ID int `json:"id"`
-	} `json:"data"`
-}
 
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
@@ -64,7 +49,7 @@ func LoginSpotifyHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
-func getTrackNumberFromDeezer(w http.ResponseWriter) DeezerTrackNumberResponse {
+func getTrackNumberFromDeezer(w http.ResponseWriter) models.DeezerTrackNumberResponse {
 	deezerPlaylistID := os.Getenv("DEEZER_PLAYLIST_ID")
 	if deezerPlaylistID == "" {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -72,7 +57,7 @@ func getTrackNumberFromDeezer(w http.ResponseWriter) DeezerTrackNumberResponse {
 			"status":  "error",
 			"message": "DEEZER_PLAYLIST_ID not set in environment",
 		})
-		return DeezerTrackNumberResponse{}
+		return models.DeezerTrackNumberResponse{}
 	}
 
 	url := fmt.Sprintf("https://api.deezer.com/playlist/%s", deezerPlaylistID)
@@ -85,17 +70,17 @@ func getTrackNumberFromDeezer(w http.ResponseWriter) DeezerTrackNumberResponse {
 			"status":  "error",
 			"message": "Failed to fetch playlist from Deezer",
 		})
-		return DeezerTrackNumberResponse{}
+		return models.DeezerTrackNumberResponse{}
 	}
 	defer resp.Body.Close()
 
-	var nbTracksDeezer DeezerTrackNumberResponse
+	var nbTracksDeezer models.DeezerTrackNumberResponse
 	json.NewDecoder(resp.Body).Decode(&nbTracksDeezer)
 
 	return nbTracksDeezer
 }
 
-func getTrackNumberFromSpotify(w http.ResponseWriter) SpotifyTrackNumberResponse {
+func getTrackNumberFromSpotify(w http.ResponseWriter) models.SpotifyTrackNumberResponse {
 
 	spotifyPlaylistID := os.Getenv("SPOTIFY_PLAYLIST_ID")
 	if spotifyPlaylistID == "" {
@@ -104,7 +89,7 @@ func getTrackNumberFromSpotify(w http.ResponseWriter) SpotifyTrackNumberResponse
 			"status":  "error",
 			"message": "SPOTIFY_PLAYLIST_ID not set in environment",
 		})
-		return SpotifyTrackNumberResponse{}
+		return models.SpotifyTrackNumberResponse{}
 	}
 	url := fmt.Sprintf("https://api.spotify.com/v1/playlists/%s", spotifyPlaylistID)
 
@@ -122,11 +107,11 @@ func getTrackNumberFromSpotify(w http.ResponseWriter) SpotifyTrackNumberResponse
 			"status":  "error",
 			"message": "Failed to fetch playlist from Spotify",
 		})
-		return SpotifyTrackNumberResponse{}
+		return models.SpotifyTrackNumberResponse{}
 	}
 	defer resp.Body.Close()
 
-	var nbTracksSpotify SpotifyTrackNumberResponse
+	var nbTracksSpotify models.SpotifyTrackNumberResponse
 	json.NewDecoder(resp.Body).Decode(&nbTracksSpotify)
 
 	return nbTracksSpotify
@@ -141,6 +126,36 @@ func GetSyncStatusHandler(w http.ResponseWriter, r *http.Request) {
 	result := map[string]interface{}{
 		"status":       "success",
 		"sync_status":  "All playlists are synchronised",
+	}
+
+	json.NewEncoder(w).Encode(result)
+}
+
+func GetRandomTrackHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	url := "https://api.deezer.com/track/3208591241" // Example track ID
+
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Fatal(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status":  "error",
+			"message": "Failed to fetch track from Deezer",
+		})
+		return
+	}
+	defer resp.Body.Close()
+
+	var trackResponse models.DeezerTrackResponse
+	json.NewDecoder(resp.Body).Decode(&trackResponse)
+
+	result := map[string]interface{}{
+		"status":	"success",
+		"track":	trackResponse.Title,
+		"artist":	trackResponse.Artist.Name,
+		"album":	trackResponse.Album.Title,
 	}
 
 	json.NewEncoder(w).Encode(result)
