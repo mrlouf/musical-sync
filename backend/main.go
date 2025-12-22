@@ -24,9 +24,10 @@ func main() {
 	http.HandleFunc("/health", handlers.HealthHandler)
 	http.HandleFunc("/playlists/tracknumbers", handlers.GetTrackNumberFromBothPlaylistsHandler)
 	http.HandleFunc("/login/spotify", handlers.LoginSpotifyHandler)
-	http.HandleFunc("/track/random", handlers.GetRandomTrackHandler)
-	http.HandleFunc("/album/random", handlers.GetRandomAlbumHandler)
-	http.HandleFunc("/playlist/deezer", handlers.GetPlaylistHandler)
+	http.HandleFunc("/track/random", handlers.GetRandomDeezerTrackHandler)
+	http.HandleFunc("/album/random", handlers.GetRandomDeezerAlbumHandler)
+	http.HandleFunc("/playlist/deezer", handlers.GetDeezerPlaylistHandler)
+	http.HandleFunc("/playlist/spotify", handlers.GetSpotifyPlaylistHandler)
 	http.HandleFunc("/sync-status", handlers.GetSyncStatusHandler)
 
 	server := &http.Server{

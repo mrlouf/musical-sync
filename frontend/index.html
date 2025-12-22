@@ -259,7 +259,8 @@
                 .then(playlistinfo => {
                     const container = document.getElementById('status-container');
 
-                    const trackData = JSON.parse(playlistinfo);
+                    container.innerHTML = playlistinfo
+/*                     const trackData = JSON.parse(playlistinfo);
 
                     const tracks = trackData.tracks;
 
@@ -275,7 +276,7 @@
                         <div style="margin-top: 15px;">
                             ${tracklist.join('')}
                         </div>
-                    </div>`;
+                    </div>`; */
                 })
                 .catch(error => {
                     console.error('Error:', error);
