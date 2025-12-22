@@ -12,10 +12,7 @@
         <p class="subtitle">Synchronise your playlists across platforms</p>
 
         <div style="margin-bottom: 20px" class="button-group">
-            <button onclick="getTrackNumberFromPlaylists()">
-                Check the track number difference between Deezer and Spotify
-            </button>
-            <button onclick="getSyncStatus()">
+            <button onclick="getPlaylistFromDeezer()">
                 Check Sync status between Deezer and Spotify
             </button>
         </div>
@@ -46,11 +43,8 @@
             <button onclick="checkBackendHealth()">
                 Check Backend Health
             </button>
-            <button onclick="getRandomTrack()">
-                Get random track
-            </button>
-            <button onclick="getAlbum()">
-                Get a random album
+            <button onclick="refreshSyncStatus()">
+                Refresh Sync Status
             </button>
         </div>
     </div>
@@ -68,64 +62,19 @@
                 });
         }
 
-        function getRandomTrack() {
-            fetch('/api/track/random')
+        function refreshSyncStatus() {
+            fetch('/api/sync-status')
                 .then(response => response.text())
-                .then(trackinfo => {
-                    const container = document.getElementById('status-container');
-
-                    const trackData = JSON.parse(trackinfo);
-
-                    container.innerHTML = `<div class="sync-status">
-                        <h2 style="margin-bottom: 20px; color: #333;">Track retrieved:</h2>
-                        <div class="status-item">
-                            <span class="status-label">${trackData.artist}</span>
-                            <span class="status-label">${trackData.track}</span>
-                            <span class="status-label">${trackData.album}</span>
-                        </div>
-                    </div>`;
+                .then(html => {
+                    // Safe to use innerHTML here as the backend returns trusted HTML
+                    document.getElementById('status-container').innerHTML = html;
                 })
                 .catch(error => {
                     console.error('Error:', error);
                 });
         }
 
-        function getAlbum() {
-            fetch('/api/album/random')
-                .then(response => response.text())
-                .then(albuminfo => {
-                    const container = document.getElementById('status-container');
-
-                    const trackData = JSON.parse(albuminfo);
-
-                    console.log(trackData);
-
-                    const tracks = trackData.tracks;
-
-                    const tracklist = Array.isArray(tracks) ? tracks.map((element, idx) => {
-                        const title = typeof element === 'string' ? element : (element.title || element.name || JSON.stringify(element));
-                        return `<div class="status-item">
-                                    <span class="status-label">${idx + 1}. ${title}</span>
-                                </div>`;
-                    }) : [];
-
-                    container.innerHTML = `<div class="sync-status">
-                        <h2 style="margin-bottom: 20px; color: #333;">Album retrieved:</h2>
-                        <div class="status-item">
-                            <span class="status-label">${trackData.artist}</span>
-                            <span class="status-label">${trackData.album}</span>
-                        </div>
-                        <div style="margin-top: 15px;">
-                            ${tracklist.join('')}
-                        </div>
-                    </div>`;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        }
-
-        async function getTrackNumberFromPlaylists() {
+        async function getPlaylistFromDeezer() {
             const container = document.getElementById('status-container');
             // show a loading state
             container.innerHTML = `<div class="sync-status">
@@ -178,41 +127,6 @@
                 .catch(error => {
                     console.error('Error:', error);
                 });
-        }
-
-        async function getSyncStatus() {
-            const container = document.getElementById('status-container');
-            // show a loading state
-            container.innerHTML = `<div class="sync-status">
-                <h2 style="margin-bottom: 20px; color: #333;">Sync Status</h2>
-                <div class="status-item">
-                    <span class="status-label">Loading…</span>
-                    <span class="status-value">⌛</span>
-                </div>
-            </div>`;
-
-            try {
-                const res = await fetch('/api/sync-status');
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const html = await res.text();
-
-                const content = `<div class="sync-status">
-                    <h2 style="margin-bottom: 20px; color: #333;">Sync Status</h2>
-                    <div class="status-item">
-                        <span class="status-label">All tracks are synchronised: </span>
-                        <span class="status-value" id="sync-ok">OK</span>
-                    </div>
-                    </div>`;
-                container.innerHTML = content;
-            } catch (err) {
-                console.error('Error fetching sync status:', err);
-                container.innerHTML = `<div class="sync-status">
-                    <div class="status-item">
-                        <span class="status-label">Error:</span>
-                        <span class="status-value">Failed to load sync status</span>
-                    </div>
-                </div>`;
-            }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
