@@ -11,6 +11,7 @@ type SpotifyTrackNumberResponse struct {
 }
 
 type DeezerTracklistResponse struct {
+	Title string `json:"title"`
 	Data []struct {
 		Title string `json:"title"`
 		Artist struct {

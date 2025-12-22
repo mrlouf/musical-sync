@@ -225,11 +225,7 @@
                 .then(playlistinfo => {
                     const container = document.getElementById('status-container');
 
-                    container.innerHTML = playlistinfo;
-
-/*                     const trackData = JSON.parse(playlistinfo);
-
-                    console.log(trackData);
+                    const trackData = JSON.parse(playlistinfo);
 
                     const tracks = trackData.tracks;
 
@@ -242,13 +238,10 @@
 
                     container.innerHTML = `<div class="sync-status">
                         <h2 style="margin-bottom: 20px; color: #333;">Playlist retrieved:</h2>
-                        <div class="status-item">
-                            <span class="status-label">${trackData.name}</span>
-                        </div>
                         <div style="margin-top: 15px;">
                             ${tracklist.join('')}
                         </div>
-                    </div>`; */
+                    </div>`;
                 })
                 .catch(error => {
                     console.error('Error:', error);

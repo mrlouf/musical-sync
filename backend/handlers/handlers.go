@@ -204,7 +204,7 @@ func GetPlaylistHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := fmt.Sprintf("https://api.deezer.com/playlist/%s/tracks", deezerPlaylistID)
+	url := fmt.Sprintf("https://api.deezer.com/playlist/%s/tracks?limit=1000", deezerPlaylistID)
 
 	resp, err := http.Get(url)
 	if err != nil {
@@ -223,6 +223,7 @@ func GetPlaylistHandler(w http.ResponseWriter, r *http.Request) {
 
 	result := map[string]interface{}{
 		"status":	"success",
+		"title":	tracklistResponse.Title,
 		"tracks":	tracklistResponse.Data,
 	}
 
