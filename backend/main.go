@@ -22,10 +22,12 @@ func main() {
 	defer cancel()
 
 	http.HandleFunc("/health", handlers.HealthHandler)
-	http.HandleFunc("/playlist/deezer", handlers.GetTrackNumberFromBothPlaylistsHandler)
+	http.HandleFunc("/playlists/tracknumbers", handlers.GetTrackNumberFromBothPlaylistsHandler)
 	http.HandleFunc("/login/spotify", handlers.LoginSpotifyHandler)
 	http.HandleFunc("/track/random", handlers.GetRandomTrackHandler)
 	http.HandleFunc("/album/random", handlers.GetRandomAlbumHandler)
+	http.HandleFunc("/playlist/deezer", handlers.GetPlaylistHandler)
+	http.HandleFunc("/sync-status", handlers.GetSyncStatusHandler)
 
 	server := &http.Server{
 		Addr: ":" + port,

@@ -190,3 +190,41 @@ func GetRandomAlbumHandler(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(result)
 }
+
+func GetPlaylistHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	deezerPlaylistID := os.Getenv("DEEZER_PLAYLIST_ID")
+	if deezerPlaylistID == "" {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status":  "error",
+			"message": "DEEZER_PLAYLIST_ID not set in environment",
+		})
+		return
+	}
+
+	url := fmt.Sprintf("https://api.deezer.com/playlist/%s/tracks", deezerPlaylistID)
+
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Fatal(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status":  "error",
+			"message": "Failed to fetch playlist tracks from Deezer",
+		})
+		return
+	}
+	defer resp.Body.Close()
+
+	var tracklistResponse models.DeezerTracklistResponse
+	json.NewDecoder(resp.Body).Decode(&tracklistResponse)
+
+	result := map[string]interface{}{
+		"status":	"success",
+		"tracks":	tracklistResponse.Data,
+	}
+
+	json.NewEncoder(w).Encode(result)
+}

@@ -10,7 +10,10 @@
     <div class="container">
         <h1>🎵 Musical Sync</h1>
         <p class="subtitle">Synchronise your playlists across platforms</p>
-
+        <div style="margin-bottom: 20px; text-align: right;" class="status-item">
+            <span class="status-label">Backend Status:</span>
+            <span class="status-value" id="backend-status">Checking...</span>
+        </div>
         <div style="margin-bottom: 20px" class="button-group">
             <button onclick="getTrackNumberFromPlaylists()">
                 Check the track number difference between Deezer and Spotify
@@ -23,10 +26,6 @@
         <div id="status-container">
             <div class="sync-status">
                 <h2 style="margin-bottom: 20px; color: #333;">Sync Status</h2>
-                <div class="status-item">
-                    <span class="status-label">Backend Status:</span>
-                    <span class="status-value" id="backend-status">Checking...</span>
-                </div>
                 <div class="status-item">
                     <span class="status-label">Deezer Connection:</span>
                     <span class="status-value" id="deezer-status">Not connected</span>
@@ -43,14 +42,19 @@
         </div>
 
         <div class="button-group">
-            <button onclick="checkBackendHealth()">
-                Check Backend Health
+            <button onclick="getPlaylist()">
+                Get a playlist
             </button>
             <button onclick="getRandomTrack()">
-                Get random track
+                Get a random track
             </button>
             <button onclick="getAlbum()">
                 Get a random album
+            </button>
+        </div>
+        <div class="button-group">
+            <button onclick="checkBackendHealth()">
+                Check Backend Health
             </button>
         </div>
     </div>
@@ -137,7 +141,7 @@
             </div>`;
 
             try {
-                const res = await fetch('/api/playlist/deezer');
+                const res = await fetch('/api/playlists/tracknumbers');
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
 
@@ -213,6 +217,42 @@
                     </div>
                 </div>`;
             }
+        }
+
+        function getPlaylist() {
+            fetch('/api/playlist/deezer')
+                .then(response => response.text())
+                .then(playlistinfo => {
+                    const container = document.getElementById('status-container');
+
+                    container.innerHTML = playlistinfo;
+
+/*                     const trackData = JSON.parse(playlistinfo);
+
+                    console.log(trackData);
+
+                    const tracks = trackData.tracks;
+
+                    const tracklist = tracks.map((element, idx) => {
+                        const title = typeof element === 'string' ? element : (element.title || element.name || JSON.stringify(element));
+                        return `<div class="status-item">
+                                    <span class="status-label">${idx + 1}. ${title}</span>
+                                </div>`;
+                    });
+
+                    container.innerHTML = `<div class="sync-status">
+                        <h2 style="margin-bottom: 20px; color: #333;">Playlist retrieved:</h2>
+                        <div class="status-item">
+                            <span class="status-label">${trackData.name}</span>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            ${tracklist.join('')}
+                        </div>
+                    </div>`; */
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
         }
 
         document.addEventListener('DOMContentLoaded', function() {
