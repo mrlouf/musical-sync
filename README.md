@@ -1,78 +1,121 @@
 # musical-sync
+A backend oriented project using JavaScript and Golang to synchronize your playlists across platforms.
 
-A backend-oriented project to synchronize music playlists across platforms.
+## Architecture
 
----
+This application consists of three main components running in Docker containers:
 
-## Why this project?
+1. **Nginx** - Reverse proxy routing requests to frontend and backend
+2. **Frontend** - Simple JavaScript-based web interface for playlist synchronization
+3. **Backend** - Golang server that polls Deezer and Spotify APIs
 
-In 2025, I migrated from Spotify to Deezer as a premium user for various reasons - pricing policies and sound quality being the main ones.
+## Prerequisites
 
-I used a publicly available platform to copy all my playlists from Spotify to ensure I had a backup, even though I do not plan on deleting my account on either platform.  
-The main issue I encountered was with a collaborative playlist shared with a Spotify user: I made a copy of the playlist, but adding a song on Deezer does not reflect on Spotify, and vice versa.
+- Docker
+- Docker Compose
 
-Some public apps offer cross-platform playlist synchronisation, which is neat, but most features, even basic ones, are locked behind premium plans.  
-Also, I was not particularly happy with the performance of the apps I tried.
+## Getting Started
 
-That’s when I had the idea to develop my own service. After all, unhappy software engineers are responsible for half the tech stack we use today, right?
+### 1. Clone the repository
 
----
-
-## Tech used
-
-Since I am focusing on backend engineering, I chose **Golang** as the language for the backend server. The syntax is pretty intuitive, especially for someone accustomed to good ol’ C and compiled languages in general. Some aspects - like package imports or nested structs for JSON handling - are a bit more complex, but overall the learning curve is fairly smooth.
-
-The frontend is intentionally minimal: static **HTML + CSS + vanilla JavaScript**. This gets the job done, and I am definitely not going to spend time learning React or Vue for a project of this size.  
-I am considering **HTMX** as a lightweight alternative to rely even more on server-side logic, but this is not a top priority.
-
-The application is containerized with **Docker** for portability, with **NGINX** acting as a reverse proxy.
-
----
-
-## Architecture overview
-
-```text
-+---------------------------+
-|Frontend (HTML / CSS / JS) |
-+---------------------------+
-              |
-        HTTP Requests
-              |
-              v
-+---------------------------+
-|           NGINX           |
-|      (Reverse Proxy)      |
-+---------------------------+
-              |
-          REST API
-              |
-              v
-+---------------------------+
-|       Go API Server       |
-+---------------------------+
-              |
-        External APIs
-              |
-              v
-+---------------------------+
-|   Spotify / Deezer APIs   |
-+---------------------------+
+```bash
+git clone https://github.com/mrlouf/musical-sync.git
+cd musical-sync
 ```
 
----
+### 2. Configure environment variables (optional)
 
-## Current status
+```bash
+cp .env.example .env
+# Edit .env with your API keys if you have them
+```
 
-The application is able to retrieve information about an artist, an album, or a playlist from both Deezer and Spotify using their respective APIs.
+### 3. Build and run with Docker Compose
 
-Unfortunately, Deezer has stopped the creation of new developer applications. As a result, the synchronisation is currently **uni-directional**, meaning playlists can only be synchronised from **Deezer to Spotify**.
+**Using Make (recommended):**
 
-A reverse synchronization mechanism may be achievable through manual updates, but this is not on the agenda for now.
+```bash
+make build    # Build all images
+make up       # Start all services
+make logs     # View logs
+make down     # Stop all services
+make help     # See all available commands
+```
 
----
+**Using Docker Compose directly:**
 
-## Future objectives / TODO
+```bash
+docker compose up --build
+```
 
-- Retrieve the tracklist from a playlist and compare it to another playlist
-- Add user authentication via OAuth
-- Implement actual playlist synchronisation logic
+The application will be available at `http://localhost`
+
+### 4. Stop the application
+
+```bash
+make down
+# or
+docker compose down
+```
+
+## Services
+
+### Nginx (Port 80)
+- Acts as a reverse proxy
+- Routes `/` to the frontend
+- Routes `/api/*` to the backend
+
+### Frontend (Internal: Port 8080)
+- JavaScript-based single-page application
+- Provides UI for checking sync status
+- Communicates with backend via fetch API
+
+### Backend (Internal: Port 8081)
+- Golang REST API server
+- Polls external APIs (Deezer, Spotify) every 30 seconds
+- Endpoints:
+  - `GET /health` - Health check
+  - `GET /sync-status` - Current synchronization status
+  - `GET /poll/deezer` - Manually trigger Deezer poll
+  - `GET /poll/spotify` - Manually trigger Spotify poll
+
+## Development
+
+### Backend Development
+
+```bash
+cd backend
+go run main.go
+```
+
+### Frontend Development
+
+The frontend is a static HTML file using plain JavaScript. Edit `frontend/index.html` and refresh your browser.
+
+## Project Structure
+
+```
+musical-sync/
+├── nginx/
+│   ├── Dockerfile
+│   └── nginx.conf
+├── frontend/
+│   ├── Dockerfile
+│   └── index.html
+├── backend/
+│   ├── Dockerfile
+│   ├── go.mod
+│   └── main.go
+├── docker-compose.yml
+├── .env.example
+└── README.md
+```
+
+## Future Enhancements
+
+- Implement actual Deezer API integration
+- Implement actual Spotify API integration
+- Add OAuth authentication flow
+- Add database for storing sync history
+- Add user authentication
+- Implement actual playlist synchronization logic

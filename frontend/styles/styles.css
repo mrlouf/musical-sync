@@ -68,6 +68,11 @@ h1 {
 	font-weight: 500;
 }
 
+.status-ok {
+	color: #25df44;
+	font-weight: 500;
+}
+
 .button-group {
 	display: flex;
 	gap: 15px;
