@@ -224,11 +224,21 @@
             }
         }
 
-        function getPlaylistFromDeezer() {
-            fetch('/api/playlist/deezer')
-                .then(response => response.text())
-                .then(playlistinfo => {
-                    const container = document.getElementById('status-container');
+        async function getPlaylistFromDeezer() {
+            const container = document.getElementById('status-container');
+            // show a loading state
+            container.innerHTML = `<div class="sync-status">
+                <h2 style="margin-bottom: 20px; color: #333;">Sync Status</h2>
+                <div class="status-item">
+                    <span class="status-label">Loading…</span>
+                    <span class="status-value">⌛</span>
+                </div>
+            </div>`;
+
+            try {
+                const response = await fetch('/api/playlist/deezer');
+                const playlistinfo = await response.text();
+                const container = document.getElementById('status-container');
 
                     const trackData = JSON.parse(playlistinfo);
 
@@ -247,19 +257,34 @@
                             ${tracklist.join('')}
                         </div>
                     </div>`;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+
+            } catch (err) {
+                console.error('Error fetching sync status:', err);
+                container.innerHTML = `<div class="sync-status">
+                    <div class="status-item">
+                        <span class="status-label">Error:</span>
+                        <span class="status-value">Failed to load sync status</span>
+                    </div>
+                </div>`;
+            }
         }
 
-        function getPlaylistFromSpotify() {
-            fetch('/api/playlist/spotify')
-                .then(response => response.text())
-                .then(playlistinfo => {
+        async function getPlaylistFromSpotify() {
+            const container = document.getElementById('status-container');
+            // show a loading state
+            container.innerHTML = `<div class="sync-status">
+                <h2 style="margin-bottom: 20px; color: #333;">Sync Status</h2>
+                <div class="status-item">
+                    <span class="status-label">Loading…</span>
+                    <span class="status-value">⌛</span>
+                </div>
+            </div>`;
+
+            try {
+                const response = await fetch('/api/playlist/spotify');
+                const playlistinfo = await response.text();
                     const container = document.getElementById('status-container');
 
-/*                     container.innerHTML = playlistinfo */
                     const trackData = JSON.parse(playlistinfo);
                     const tracks = trackData.tracks;
 
@@ -276,10 +301,16 @@
                             ${tracklist.join('')}
                         </div>
                     </div>`;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+
+            } catch (err) {
+                console.error('Error fetching sync status:', err);
+                container.innerHTML = `<div class="sync-status">
+                    <div class="status-item">
+                        <span class="status-label">Error:</span>
+                        <span class="status-value">Failed to load sync status</span>
+                    </div>
+                </div>`;
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
