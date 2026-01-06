@@ -1,10 +1,7 @@
 FROM nginx:alpine
 
-# Copy the HTML file & CSS
-COPY ./index.html /usr/share/nginx/html/index.html
-COPY ./styles/styles.css /usr/share/nginx/html/styles/styles.css
+COPY . /usr/share/nginx/html
 
-# Create a custom nginx config to listen on port 8080
 RUN echo 'server { \
     listen 8080; \
     server_name localhost; \
