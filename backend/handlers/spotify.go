@@ -63,51 +63,75 @@ func getTrackNumberFromSpotify(w http.ResponseWriter) models.SpotifyTrackNumberR
 }
 
 func GetSpotifyPlaylistHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+    w.Header().Set("Content-Type", "application/json")
 
-	spotifyPlaylistID := os.Getenv("SPOTIFY_PLAYLIST_ID")
-	if spotifyPlaylistID == "" {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"status":  "error",
-			"message": "SPOTIFY_PLAYLIST_ID not set in environment",
-		})
-		return
-	}
-	url := fmt.Sprintf("https://api.spotify.com/v1/playlists/%s/tracks", spotifyPlaylistID)
+    spotifyPlaylistID := os.Getenv("SPOTIFY_PLAYLIST_ID")
+    if spotifyPlaylistID == "" {
+        w.WriteHeader(http.StatusInternalServerError)
+        json.NewEncoder(w).Encode(map[string]interface{}{
+            "status":  "error",
+            "message": "SPOTIFY_PLAYLIST_ID not set in environment",
+        })
+        return
+    }
 
-	req, err := http.NewRequest("GET", url, nil)
-	token := utils.GenerateSpotifyToken()
-	fmt.Println("Generated Spotify Token:", token)
-	req.Header.Set("Authorization", "Bearer " + token)
+    var allTracks []models.SpotifyPlaylistItem
+    limit := 100
+    offset := 0
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"status":  "error",
-			"message": "Failed to fetch playlist from Spotify",
-		})
-		return
-	}
-	defer resp.Body.Close()
+    token := utils.GenerateSpotifyToken()
+    client := &http.Client{}
 
-	fmt.Printf("Spotify API response status: %s\n", resp.Status)
+    for {
+        url := fmt.Sprintf("https://api.spotify.com/v1/playlists/%s/tracks?limit=%d&offset=%d", spotifyPlaylistID, limit, offset)
+        req, err := http.NewRequest("GET", url, nil)
+        if err != nil {
+            log.Fatal(err)
+            w.WriteHeader(http.StatusInternalServerError)
+            json.NewEncoder(w).Encode(map[string]interface{}{
+                "status":  "error",
+                "message": "Failed to create request",
+            })
+            return
+        }
+        req.Header.Set("Authorization", "Bearer "+token)
 
-	var playlistData models.SpotifyPlaylistResponse
+        resp, err := client.Do(req)
+        if err != nil {
+            log.Fatal(err)
+            w.WriteHeader(http.StatusInternalServerError)
+            json.NewEncoder(w).Encode(map[string]interface{}{
+                "status":  "error",
+                "message": "Failed to fetch playlist from Spotify",
+            })
+            return
+        }
+        defer resp.Body.Close()
 
-	json.NewDecoder(resp.Body).Decode(&playlistData)
+        var playlistData models.SpotifyPlaylistResponse
+        if err := json.NewDecoder(resp.Body).Decode(&playlistData); err != nil {
+            log.Fatal(err)
+            w.WriteHeader(http.StatusInternalServerError)
+            json.NewEncoder(w).Encode(map[string]interface{}{
+                "status":  "error",
+                "message": "Failed to decode Spotify response",
+            })
+            return
+        }
 
-	fmt.Printf("%v\n", playlistData)
-	fmt.Printf("Fetched %d tracks from Spotify playlist\n", len(playlistData.Items))
-	// fmt.Printf("%v\n", playlistData.Items[0].Track.Name) // Print the name of the first track for debugging
+        allTracks = append(allTracks, playlistData.Items...)
 
-	result := map[string]interface{}{
-		"status":	"success",
-		"tracks":	playlistData.Items,
-	}
+        if len(playlistData.Items) < limit {
+			fmt.Println("All tracks fetched from Spotify playlist.")
+            break
+        }
+        offset += limit
+    }
 
-	json.NewEncoder(w).Encode(result)
+    result := map[string]interface{}{
+        "status": "success",
+        "tracks": allTracks,
+    }
+
+    json.NewEncoder(w).Encode(result)
 }
