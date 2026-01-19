@@ -28,7 +28,7 @@ services:
       dockerfile: Dockerfile
     container_name: backend
     volumes:
-      - ./backend:/app
+      - ./backend:/app # Mount the backend source code for hot reloading with Air
     environment:
       - PORT=8081
     env_file:
