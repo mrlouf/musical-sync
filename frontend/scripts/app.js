@@ -134,15 +134,17 @@ async function getSyncStatus() {
         const res = await fetch('/api/sync-status');
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const html = await res.text();
+        const data = JSON.parse(html);
 
         const content = `<div class="sync-status">
             <h2 style="margin-bottom: 20px; color: #333;">Sync Status</h2>
             <div class="status-item">
-                <span class="status-label">All tracks are synchronised: </span>
-                <span class="status-value" id="sync-ok">OK</span>
+                <span class="status-label">Synch status: </span>
+                <span class="status-value">${data.sync_status}</span>
             </div>
         </div>`;
         container.innerHTML = content;
+
     } catch (err) {
         console.error('Error fetching sync status:', err);
         container.innerHTML = `<div class="sync-status">
