@@ -9,6 +9,7 @@ import (
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	w.WriteHeader(http.StatusOK)
+	fmt.Println("cucufu")
 	fmt.Fprintf(w, `<span class="status-value">✅ Running</span>`)
 }
 

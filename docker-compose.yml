@@ -27,6 +27,8 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: backend
+    volumes:
+      - ./backend:/app
     environment:
       - PORT=8081
     env_file:
