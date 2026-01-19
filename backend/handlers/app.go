@@ -39,7 +39,6 @@ func GetSyncStatusHandler(w http.ResponseWriter, r *http.Request) {
 	go func() {
 		spotify <- getTrackNumberFromSpotify(w)
 	}()
-
 	go func() {
 		deezer <- getTrackNumberFromDeezer(w)
 	}()
@@ -50,25 +49,19 @@ func GetSyncStatusHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Spotify Tracks:", nbTracksSpotify.Tracks.Total)
 	fmt.Println("Deezer Tracks:", nbTracksDeezer.Total)
 
-	if nbTracksSpotify.Tracks.Total != nbTracksDeezer.Total {
-		result := map[string]interface{}{
-			"status":       "success",
-			"sync_status":  "Playlists are not synchronised",
-		}
-
-		close(spotify)
-		close(deezer)
-
-		json.NewEncoder(w).Encode(result)
-		return
-	}
-
 	close(spotify)
 	close(deezer)
 
+	var sync_status string
+	if nbTracksDeezer.Total == nbTracksSpotify.Tracks.Total {
+		sync_status = "Playlists are synchronised"
+	} else {
+		sync_status = "Playlists are not synchronised"
+	}
+
 	result := map[string]interface{}{
 		"status":       "success",
-		"sync_status":  "All playlists are synchronised",
+		"sync_status":  sync_status,
 	}
 
 	json.NewEncoder(w).Encode(result)
